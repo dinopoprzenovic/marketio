@@ -1,0 +1,68 @@
+import { ServiceCategory } from "@/types";
+
+export const serviceCategories: ServiceCategory[] = [
+  {
+    id: "topups",
+    name: "Telco Top-ups",
+    description: "Prepaid top-ups for A1, T-Mobile, Telemach",
+    icon: "Smartphone",
+    href: "/topups",
+    color: "#3B82F6",
+  },
+  {
+    id: "gaming",
+    name: "Gaming Vouchers",
+    description: "PlayStation, Xbox, Steam & more",
+    icon: "Gamepad2",
+    href: "/gaming",
+    color: "#8B5CF6",
+  },
+  {
+    id: "vouchers",
+    name: "E-commerce Vouchers",
+    description: "Gift cards for retail brands",
+    icon: "ShoppingBag",
+    href: "/vouchers",
+    color: "#EC4899",
+  },
+  {
+    id: "vignettes",
+    name: "Highway Vignettes",
+    description: "E-vignettes for 9+ European countries",
+    icon: "Route",
+    href: "/vignettes",
+    color: "#10B981",
+  },
+  {
+    id: "parking",
+    name: "Parking",
+    description: "Pay for parking from your phone",
+    icon: "ParkingSquare",
+    href: "/parking",
+    color: "#06B6D4",
+  },
+  {
+    id: "lottery",
+    name: "Lottery & Paysafe",
+    description: "Croatian Lottery, Paysafecard",
+    icon: "Ticket",
+    href: "/lottery",
+    color: "#F59E0B",
+  },
+  {
+    id: "loyalty",
+    name: "Loyalty Cards",
+    description: "Store all your loyalty cards digitally",
+    icon: "CreditCard",
+    href: "/loyalty",
+    color: "#6366F1",
+  },
+  {
+    id: "history",
+    name: "Transaction History",
+    description: "View your past purchases",
+    icon: "Receipt",
+    href: "/history",
+    color: "#64748B",
+  },
+];
