@@ -10,6 +10,7 @@ import { StepTransition, StaggerGrid, StaggerItem } from "@/components/animation
 import { MapPin, Clock } from "lucide-react";
 import { parkingZones, parkingDurations } from "@/data/parking";
 import { addTransaction } from "@/lib/store";
+import { sanitizePlate, isValidPlate } from "@/lib/validation";
 import type { ParkingZone } from "@/types";
 
 type Step = "zone" | "plate" | "duration" | "done";
@@ -42,9 +43,12 @@ export default function ParkingPage() {
   const [step, setStep] = useState<Step>("zone");
   const [selectedZone, setSelectedZone] = useState<ParkingZone | null>(null);
   const [licensePlate, setLicensePlate] = useState("");
+  const [plateTouched, setPlateTouched] = useState(false);
   const [selectedDuration, setSelectedDuration] = useState<typeof parkingDurations[0] | null>(null);
   const [loading, setLoading] = useState(false);
   const [ticketNumber, setTicketNumber] = useState("");
+
+  const plateValid = isValidPlate(licensePlate);
 
   const suggestedZone = parkingZones[1]; // Zone 2 - Inner City
 
@@ -54,7 +58,7 @@ export default function ParkingPage() {
   }
 
   function handlePlateSubmit() {
-    if (licensePlate.trim().length === 0) return;
+    if (!plateValid) return;
     setStep("duration");
   }
 
@@ -191,14 +195,28 @@ export default function ParkingPage() {
             <input
               type="text"
               value={licensePlate}
-              onChange={(e) => setLicensePlate(e.target.value.toUpperCase())}
+              onChange={(e) => {
+                setLicensePlate(sanitizePlate(e.target.value));
+                if (!plateTouched) setPlateTouched(true);
+              }}
+              onBlur={() => setPlateTouched(true)}
               placeholder="e.g. ZG-1234-AB"
-              className="mb-5 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-[15px] font-medium uppercase text-gray-900 placeholder:normal-case placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className={`w-full rounded-xl border bg-white px-4 py-3 text-[15px] font-medium uppercase text-gray-900 placeholder:normal-case placeholder:text-gray-400 focus:outline-none focus:ring-2 ${
+                plateTouched && licensePlate.length > 0 && !plateValid
+                  ? "border-red-400 focus:border-red-400 focus:ring-red-300/20"
+                  : "border-gray-200 focus:border-primary focus:ring-primary/20"
+              }`}
             />
+            {plateTouched && licensePlate.length > 0 && !plateValid ? (
+              <p className="mt-1.5 text-xs text-red-500">Min 4 characters — letters, numbers, and hyphens only</p>
+            ) : (
+              <p className="mt-1.5 text-xs text-gray-400">e.g. ZG-1234-AB</p>
+            )}
+            <div className="mb-5" />
 
             <PurchaseButton
               label="Continue"
-              disabled={licensePlate.trim().length === 0}
+              disabled={!plateValid}
               onClick={handlePlateSubmit}
             />
           </StepTransition>

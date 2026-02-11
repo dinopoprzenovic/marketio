@@ -10,6 +10,7 @@ import { BrandBadge } from "@/components/BrandBadge";
 import { StepTransition, StaggerGrid, StaggerItem } from "@/components/animations";
 import { telcoOperators } from "@/data/topups";
 import { addTransaction } from "@/lib/store";
+import { formatPhoneNumber, isValidPhone } from "@/lib/validation";
 import { TelcoOperator } from "@/types";
 
 type Step = "select" | "confirm" | "done";
@@ -20,16 +21,18 @@ export default function TopupsPage() {
   const [selectedOperator, setSelectedOperator] = useState<TelcoOperator | null>(null);
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneTouched, setPhoneTouched] = useState(false);
   const [step, setStep] = useState<Step>("select");
   const [loading, setLoading] = useState(false);
 
-  const canPurchase = selectedOperator && selectedAmount && phoneNumber.length >= 6;
+  const phoneValid = isValidPhone(phoneNumber);
+  const canPurchase = selectedOperator && selectedAmount && phoneValid;
 
   const currentStepIndex = !selectedOperator
     ? 0
     : !selectedAmount
       ? 1
-      : phoneNumber.length < 6
+      : !phoneValid
         ? 2
         : 3;
 
@@ -83,6 +86,7 @@ export default function TopupsPage() {
               if (selectedAmount) {
                 setSelectedAmount(null);
                 setPhoneNumber("");
+                setPhoneTouched(false);
               } else {
                 setSelectedOperator(null);
               }
@@ -156,10 +160,23 @@ export default function TopupsPage() {
             <input
               type="tel"
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="Enter phone number"
-              className="mb-5 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-[15px] text-gray-800 placeholder-gray-400 outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
+              onChange={(e) => {
+                const formatted = formatPhoneNumber(e.target.value);
+                setPhoneNumber(formatted);
+                if (!phoneTouched) setPhoneTouched(true);
+              }}
+              onBlur={() => setPhoneTouched(true)}
+              placeholder="+385 91 234 567"
+              className={`w-full rounded-xl border bg-white px-4 py-3 text-[15px] text-gray-800 placeholder-gray-400 outline-none transition-colors focus:ring-1 ${
+                phoneTouched && phoneNumber.length > 0 && !phoneValid
+                  ? "border-red-400 focus:border-red-400 focus:ring-red-300"
+                  : "border-gray-200 focus:border-primary focus:ring-primary"
+              }`}
             />
+            {phoneTouched && phoneNumber.length > 0 && !phoneValid && (
+              <p className="mt-1.5 text-xs text-red-500">Enter a valid phone number</p>
+            )}
+            <div className="mb-5" />
           </StepTransition>
         )}
 

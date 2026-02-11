@@ -10,6 +10,7 @@ import { StepTransition, StaggerGrid, StaggerItem } from "@/components/animation
 import { Car, Bike } from "lucide-react";
 import { vignetteCountries } from "@/data/vignettes";
 import { addTransaction } from "@/lib/store";
+import { sanitizePlate, isValidPlate } from "@/lib/validation";
 import type { VignetteCountry, VehicleType, VignetteDuration } from "@/types";
 
 type Step = "country" | "vehicle" | "duration" | "plate" | "done";
@@ -78,8 +79,11 @@ export default function VignettesPage() {
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleType | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<VignetteDuration | null>(null);
   const [licensePlate, setLicensePlate] = useState("");
+  const [plateTouched, setPlateTouched] = useState(false);
   const [vignetteId, setVignetteId] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const plateValid = isValidPlate(licensePlate);
 
   const hasMultipleVehicles = (selectedCountry?.vehicleTypes.length ?? 0) > 1;
 
@@ -279,10 +283,24 @@ export default function VignettesPage() {
             <input
               type="text"
               value={licensePlate}
-              onChange={(e) => setLicensePlate(e.target.value.toUpperCase())}
+              onChange={(e) => {
+                setLicensePlate(sanitizePlate(e.target.value));
+                if (!plateTouched) setPlateTouched(true);
+              }}
+              onBlur={() => setPlateTouched(true)}
               placeholder="e.g. ZG-1234-AB"
-              className="mb-5 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-[15px] font-medium uppercase text-gray-900 placeholder:normal-case placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className={`w-full rounded-xl border bg-white px-4 py-3 text-[15px] font-medium uppercase text-gray-900 placeholder:normal-case placeholder:text-gray-400 focus:outline-none focus:ring-2 ${
+                plateTouched && licensePlate.length > 0 && !plateValid
+                  ? "border-red-400 focus:border-red-400 focus:ring-red-300/20"
+                  : "border-gray-200 focus:border-primary focus:ring-primary/20"
+              }`}
             />
+            {plateTouched && licensePlate.length > 0 && !plateValid ? (
+              <p className="mt-1.5 text-xs text-red-500">Min 4 characters — letters, numbers, and hyphens only</p>
+            ) : (
+              <p className="mt-1.5 text-xs text-gray-400">e.g. ZG-1234-AB</p>
+            )}
+            <div className="mb-5" />
 
             {/* Summary card */}
             <div className="mb-5 rounded-2xl bg-white p-4 shadow-sm">
@@ -315,7 +333,7 @@ export default function VignettesPage() {
             <PurchaseButton
               label="Buy Vignette"
               price={`${selectedCountry.currency === "EUR" ? "\u20AC" : selectedCountry.currency}${selectedDuration.price.toFixed(2)}`}
-              disabled={licensePlate.trim().length === 0}
+              disabled={!plateValid}
               loading={loading}
               onClick={handlePurchase}
             />
