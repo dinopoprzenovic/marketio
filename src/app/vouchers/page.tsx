@@ -135,7 +135,7 @@ export default function VouchersPage() {
                       onClick={() => handleSelectAmount(amount)}
                       className="rounded-xl border-2 border-gray-200 px-5 py-3 text-sm font-bold text-gray-800 transition-all hover:border-primary hover:text-primary active:scale-[0.97]"
                     >
-                      \u20AC{amount}
+                      &euro;{amount}
                     </button>
                   ))}
                 </div>
@@ -163,14 +163,14 @@ export default function VouchersPage() {
                   <BrandBadge initials={selectedBrand.icon} color={selectedBrand.color} size="md" />
                   <div>
                     <p className="text-base font-bold text-gray-900">{selectedBrand.name} Gift Card</p>
-                    <p className="text-sm text-gray-500">\u20AC{selectedAmount.toFixed(2)}</p>
+                    <p className="text-sm text-gray-500">&euro;{selectedAmount.toFixed(2)}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between border-t border-gray-100 pt-3">
                   <span className="text-sm text-gray-500">Amount</span>
                   <span className="text-lg font-bold text-primary">
-                    \u20AC{selectedAmount.toFixed(2)}
+                    &euro;{selectedAmount.toFixed(2)}
                   </span>
                 </div>
               </div>

@@ -144,7 +144,7 @@ export default function TopupsPage() {
                       : "text-gray-700"
                   }`}
                 >
-                  \u20AC{amount}
+                  &euro;{amount}
                 </button>
               ))}
             </div>

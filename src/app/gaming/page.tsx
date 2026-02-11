@@ -130,7 +130,7 @@ export default function GamingPage() {
                     <span className="text-sm font-semibold text-gray-800">{voucher.label}</span>
                   </div>
                   <span className="text-sm font-bold text-primary">
-                    \u20AC{voucher.price.toFixed(2)}
+                    &euro;{voucher.price.toFixed(2)}
                   </span>
                 </button>
               ))}
@@ -164,7 +164,7 @@ export default function GamingPage() {
                 <div className="flex items-center justify-between border-t border-gray-100 pt-3">
                   <span className="text-sm text-gray-500">Amount</span>
                   <span className="text-lg font-bold text-primary">
-                    \u20AC{selectedVoucher.price.toFixed(2)}
+                    &euro;{selectedVoucher.price.toFixed(2)}
                   </span>
                 </div>
               </div>
