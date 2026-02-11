@@ -4,14 +4,28 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { AnimatedCheckmark } from "./animations";
 
+interface StatusBadgeConfig {
+  label: string;
+  color: "green" | "amber" | "blue" | "red" | "gray";
+}
+
 interface ConfirmationScreenProps {
   title: string;
   details: { label: string; value: string }[];
   amount: string;
   onDone?: () => void;
+  statusBadge?: StatusBadgeConfig;
 }
 
-export function ConfirmationScreen({ title, details, amount, onDone }: ConfirmationScreenProps) {
+const badgeColors: Record<string, string> = {
+  green: "bg-emerald-100 text-emerald-700",
+  amber: "bg-amber-100 text-amber-700",
+  blue: "bg-blue-100 text-blue-700",
+  red: "bg-red-100 text-red-700",
+  gray: "bg-gray-100 text-gray-600",
+};
+
+export function ConfirmationScreen({ title, details, amount, onDone, statusBadge }: ConfirmationScreenProps) {
   const router = useRouter();
 
   const handleDone = () => {
@@ -39,6 +53,18 @@ export function ConfirmationScreen({ title, details, amount, onDone }: Confirmat
       >
         {title}
       </motion.p>
+
+      {statusBadge && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.65, duration: 0.25 }}
+          className={`mb-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${badgeColors[statusBadge.color] ?? badgeColors.gray}`}
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-current" />
+          {statusBadge.label}
+        </motion.div>
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: 16 }}

@@ -1,6 +1,9 @@
-import { GamingPlatform } from "@/types";
+import type { GamingService, GamingPurchaseResult } from "./gaming.service";
+import type { ServiceResponse } from "../types";
+import type { GamingPlatform } from "@/types";
+import { ok } from "../types";
 
-export const gamingPlatforms: GamingPlatform[] = [
+const platforms: GamingPlatform[] = [
   {
     id: "playstation",
     name: "PlayStation",
@@ -56,3 +59,35 @@ export const gamingPlatforms: GamingPlatform[] = [
     ],
   },
 ];
+
+function generateCode(): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const group = () => Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  return `${group()}-${group()}-${group()}-${group()}`;
+}
+
+async function delay(ms = 300): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+export const mockGamingService: GamingService = {
+  async getPlatforms(): Promise<ServiceResponse<GamingPlatform[]>> {
+    await delay();
+    return ok(platforms);
+  },
+
+  async purchase(req): Promise<ServiceResponse<GamingPurchaseResult>> {
+    await delay(600);
+    const platform = platforms.find((p) => p.id === req.platformId);
+    const voucher = platform?.vouchers.find((v) => v.id === req.voucherId);
+    return ok({
+      transactionId: crypto.randomUUID(),
+      platform: platform?.name ?? req.platformId,
+      voucherLabel: voucher?.label ?? req.voucherId,
+      code: generateCode(),
+      amount: voucher?.price ?? 0,
+      currency: voucher?.currency ?? "EUR",
+      status: "completed",
+    });
+  },
+};

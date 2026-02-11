@@ -102,6 +102,37 @@ export interface ParkingDuration {
   minutes: number;
 }
 
+export interface SavedVehicle {
+  id: string;
+  plate: string;
+  nickname: string;
+  vehicleType: "car" | "motorcycle";
+  createdAt: string;
+}
+
+export type VignetteOrderStatus =
+  | "PENDING"
+  | "WILL_BE_ACTIVE"
+  | "ACTIVE"
+  | "EXPIRED"
+  | "REFUNDED"
+  | "DELETED";
+
+export interface ParkingCity {
+  id: string;
+  name: string;
+  region: string;
+  zones: CityParkingZone[];
+}
+
+export interface CityParkingZone {
+  id: string;
+  name: string;
+  color: string;
+  hourlyRate: number;
+  operatingHours: string;
+}
+
 export interface BankTheme {
   id: string;
   name: string;

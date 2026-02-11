@@ -6,64 +6,76 @@ Interactive MVP demo of Marketio — a white-label marketplace SDK for banks. Sh
 ## Tech Stack
 - Next.js 16.1.6, React 19, TypeScript, Tailwind v4
 - lucide-react (SVG icons), framer-motion (animations)
-- All data is mock/demo (no real API connections yet)
-- localStorage for loyalty cards and transaction history
+- Service adapter pattern: mock implementations today, real API client swap when partners sign
+- Next.js API Routes (serverless) as backend layer
+- localStorage for client state (loyalty cards, transactions, saved vehicles, theme)
 
-## What's Done
+## Current Phase: Phase 2 — Integration-Ready Architecture (COMPLETE)
 
-### Foundation
-- [x] Project setup (Next.js + Tailwind v4)
-- [x] Type system for all data models (including ParkingZone, ParkingDuration)
-- [x] Mock data for all service categories (8 total)
-- [x] Theme system with CSS variables (5 bank presets)
-- [x] localStorage-based store (loyalty cards, transactions, theme)
+### Phase 1 (Demo) — DONE
+- All 8 pages interactive with animations
+- 5 bank themes, white-label CSS variables
+- Mock data, localStorage persistence
+- Deployed at https://marketio-mu.vercel.app
 
-### Components
-- [x] PhoneFrame — iPhone mockup wrapper (desktop) / full-screen (mobile)
-- [x] AppHeader — navigation header with back button + Marketio logo on home
-- [x] ServiceCard — category grid cards with Lucide SVG icons
-- [x] ThemeSwitcher — bank theme toggle panel (outside phone frame)
-- [x] ConfirmationScreen — animated purchase success (spring checkmark, staggered receipt)
-- [x] PurchaseButton — styled purchase CTA with loading/spinner state
-- [x] StepIndicator — horizontal step progress dots for multi-step flows
-- [x] BrandBadge — colored initials badge for brands/operators
-- [x] MarketioLogo — SVG wordmark with shopping bag icon
-- [x] Animation wrappers — FadeIn, SlideUp, StaggerGrid, StepTransition, BottomSheet, AnimatedCheckmark
+### Phase 2 (Integration-Ready) — DONE
+- [x] Service adapter pattern (interface + mock + barrel per partner domain)
+- [x] Backend API routes (10 routes across 6 domains)
+- [x] Data-fetching hooks (useServiceQuery, useServiceMutation)
+- [x] Error handling UI (ErrorState with retry, LoadingState skeletons)
+- [x] All pages migrated from direct data imports to API-backed flows
+- [x] Parking rebuilt: 10 Croatian cities with real zones/rates, city search, region grouping
+- [x] Vignettes rebuilt: VignetteID's real 9 countries (removed Croatia/Germany, added Switzerland/Moldova), DatePicker, order status
+- [x] Saved Vehicles: shared VehiclePicker component, localStorage persistence, used on both Parking and Vignettes
+- [x] ConfirmationScreen: status badge support (ACTIVE, PENDING, etc.)
+- [x] Vignette countries updated to match VignetteID's real product catalog
+- [x] Old data files deleted (services.ts kept for home page grid)
 
-### Pages (All Interactive with Animations)
-- [x] Home — staggered grid + gradient banner with Marketio logo + SVG pattern
-- [x] Telco Top-ups — BrandBadge operators + StepIndicator + loading state
-- [x] Gaming Vouchers — BrandBadge platforms + StepIndicator + loading state
-- [x] E-commerce Vouchers — BrandBadge brands + StepIndicator + loading state
-- [x] Highway Vignettes — Lucide Car/Bike icons + StepIndicator + loading state
-- [x] Parking (NEW) — 4 zones, GPS suggestion, plate input, duration selection
-- [x] Lottery & Paysafe — Lucide icons + stagger animations + loading state
-- [x] Loyalty Cards — animated bottom sheet + staggered card list
-- [x] Transaction History — Lucide category icons + stagger animations
+## Architecture
 
-### UI Polish (Track 1 — Demo Polish)
-- [x] All emojis replaced with Lucide SVG icons (except country flags)
-- [x] Brand/operator badges (BrandBadge) instead of emoji circles
-- [x] Framer Motion animations on all pages (stagger grids, step transitions)
-- [x] Processing/loading state on all purchase buttons (1s delay + spinner)
-- [x] Animated confirmation screen (spring checkmark + staggered receipt rows)
-- [x] Step indicator on all multi-step flows (topups, gaming, vouchers, vignettes, parking)
-- [x] Animated bottom sheet for loyalty card add form
-- [x] Marketio logo in header (home page) and welcome banner
+### Service Adapter Pattern
+Each partner domain has 3 files:
+```
+src/services/{domain}/
+  {domain}.service.ts    — TypeScript interface
+  {domain}.mock.ts       — Mock implementation (current data)
+  index.ts               — Re-exports active implementation (1-line swap)
+```
 
-### White-Label Theming
-- [x] 5 bank themes: Marketio, Croatia Banka, Erste, PBZ, Raiffeisen
-- [x] Live switching via panel next to phone mockup
-- [x] Theme persists in localStorage
+### API Routes
+```
+/api/topups          GET: catalog    POST: purchase
+/api/gaming          GET: catalog    POST: purchase
+/api/vouchers        GET: catalog    POST: purchase
+/api/vignettes       GET: catalog    POST: purchase
+/api/vignettes/[id]  GET: order status
+/api/parking/cities  GET: city list
+/api/parking/zones   GET: zones for city (?cityId=xxx)
+/api/parking/session POST: start session
+/api/lottery         GET: catalog    POST: purchase
+```
+
+### When Partners Sign
+1. Create one implementation file (e.g., `topups.trilix.ts`)
+2. Change one line in the barrel `index.ts`
+3. Add API keys to `.env.local` / Vercel environment variables
+4. Test with sandbox, then go live. Zero page changes.
+
+## Partner Status
+| Partner | Provides | Status |
+|---------|----------|--------|
+| Trilix | Top-ups, gaming, gift cards | API docs in hand, no agreement signed |
+| VignetteID | Highway vignettes (9 countries) | B2B API exists, contact seller@vignette.id |
+| Bmove | On-street parking (90+ Croatian cities) | Pitch deck prepared, no public API |
 
 ## What's Next
-- [ ] Deploy to Vercel (shareable link)
-- [ ] Connect real partner APIs (Trilix DSDS, VignetteID, Bmove)
+- [ ] Redeploy to Vercel with Phase 2 changes
+- [ ] Sign partner agreements (Trilix, VignetteID, Bmove)
+- [ ] Implement real partner adapters as agreements come in
 - [ ] Bank admin dashboard
 - [ ] Authentication system (JWT passthrough from bank app)
-- [ ] PostgreSQL database (Prisma)
+- [ ] PostgreSQL database (Prisma) for order tracking/analytics
 - [ ] Native SDK wrappers (iOS, Android)
-- [ ] Analytics and reporting
 
 ## How to Run
 ```
